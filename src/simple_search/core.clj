@@ -24,7 +24,7 @@
   knapsack problem."
   [instance]
   (let [choices (repeatedly (count (:items instance))
-                            #(rand-int 2))
+                            #(rand-int 0)) ;;use 2 to return 0 or 1
         included (included-items (:items instance) choices)]
     {:instance instance
      :choices choices
@@ -74,23 +74,43 @@
       (recur
        (+ start 1)
        (let [new-inst (mutator inst)]
-         (if ( > (score new-inst) (score inst))
+         (if ( >= (score new-inst) (score inst))
            new-inst
            inst)))))
 )
 
 
+
+
 ;;;Dalton & Tom's Tweak 1: Swap random item
+(defn findFlipVal
+  "Helper: Given an array and an index, return the opposite value of the bit at that location"
+  [inst index]
+  (let [currentVal (nth inst index)]
+    (if (= currentVal 0) 1 0)))
+
+;; instance -> (mutated) instance
 (defn swap-random-item
   "Given an instance, we intend to flip a random bit off and a random bit on."
   [instance]
-  (( (count (:choices instance))
+  (let [size (count (:choices instance)),
+        flip1 (rand-int size),
+        flip2 (rand-int size),
+        flip3 (rand-int size),
+        choices (vec (:choices instance))]
+    ;(println flip1 flip2 flip3)
+    (assoc instance :choices (assoc choices flip1 (findFlipVal choices flip1)))
+   ; (assoc instance :choices (assoc choices flip2 (findFlipVal choices flip2)))
+   ; (assoc instance :choices (assoc choices flip3 (findFlipVal choices flip3)))
+  )
 )
 
-(let [rand (random-search knapPI_16_20_1000_1 10000)]
-[rand,
- "                                                 After we climed the hill, we got:"
-(run-mutator rand swap-random-item 1000)]
-)
 
+(swap-random-item (random-search knapPI_16_20_1000_1 1))
+
+(let [random-start (random-search knapPI_16_20_1000_1 1)]
+  [random-start,
+   "                                                 After we climed the hill, we got:"
+   (run-mutator random-start swap-random-item 1000)]
+  )
 
