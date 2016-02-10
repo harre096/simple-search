@@ -21,7 +21,24 @@ To get started we run **random-search** a few thousand times to get us to a dece
 
 
 ###Results
+
+Without using random restart, we hill climbed 1000 times from random-search 10,000 and got:
+For knapPI_16_11_1000_1 we climbed from:
+* 782 to 809
+* 956 to 1160
+* 809 to 809
+For knapPI_16_13_1000_1 we climbed from:
+* 1560 to 1677
+* 1482 to 1521
+* 1482 to 1521
+For knapPI_16_20_1000_1 we climbed from:
+* 1554 to 2291
+* 1559 to 1962
+* 2061 to 2172
+
 When we run random 10,000 times followed by running our climbing operation 1000 times. Most of the time, we get an answers that are significatnly better! By changing just one item at a time we are actually seeing consistent climbing!
+
+
 
 ### Random Restarts
 We didn't get this far. :(
