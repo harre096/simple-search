@@ -24,7 +24,7 @@
   knapsack problem."
   [instance]
   (let [choices (repeatedly (count (:items instance))
-                            #(rand-int 0)) ;;use 2 to return 0 or 1
+                            #(rand-int 2))
         included (included-items (:items instance) choices)]
     {:instance instance
      :choices choices
@@ -86,33 +86,50 @@
            new-inst
            inst))))))
 
-;;;Dalton & Tom's Tweak 1: Swap random item
+;;;Dalton & Tom's Tweak 1: Flip one bit
 (defn findFlipVal
   "Helper: Given an array and an index, return the opposite value of the bit at that location"
   [inst index]
   (let [currentVal (nth inst index)]
     (if (= currentVal 0) 1 0)))
 
+
+
 ;; instance -> (mutated) instance
-(defn swap-random-item
+(defn flip-one-bit
   "Given an instance, we intend to flip a random bit off and a random bit on."
-  [instance]
-  (let [size (count (:choices instance)),
-        flip1 (rand-int size),
-        flip2 (rand-int size),
-        flip3 (rand-int size),
-        choices (vec (:choices instance))]
-    (assoc instance :choices (assoc choices flip1 (findFlipVal choices flip1)))
+  [answer]
+  (let [size (count (:choices answer)),
+        flip (rand-int size),
+        choices (vec (:choices answer))]
+    (assoc answer :choices (assoc choices flip (findFlipVal choices flip)))
   )
 )
 
-(find-score (swap-random-item (random-search knapPI_16_20_1000_1 1))
+;; answer -> (mutated) answer
+(defn swap-random-item
+  "Given an instance, we intend to flip a random bit off and a random bit on."
+  [answer]
+  (let [size (count (:choices answer)),
+        flip1 (rand-int size),
+        flip2 (rand-int size),
+        flip3 (rand-int size),
+        choices (vec (:choices answer))]
+    (assoc answer :choices (assoc choices flip1 (findFlipVal choices flip1)))
+  )
 )
 
 
-(let [random-start (random-search knapPI_16_20_1000_1 1)]
+;; (find-score (flip-one-bit (random-search knapPI_16_20_1000_1 1))
+;; )
+
+;; (find-score (swap-random-item (random-search knapPI_16_20_1000_1 1))
+;; )
+
+
+(let [random-start (random-search knapPI_16_20_1000_1 10000)]
   [random-start,
    "                                                 After we climed the hill, we got:"
-   (run-mutator random-start swap-random-item 1000)]
+   (run-mutator random-start flip-one-bit 1000)]
 )
 
