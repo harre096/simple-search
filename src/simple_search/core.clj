@@ -87,18 +87,22 @@
            new-inst
            inst))))))
 
-;;;Dalton & Tom's Tweak 1: Flip one bit
+
+
+
+
+;;;Dalton & Tom's Tweak: Flip one bit
+
+
 (defn findFlipVal
   "Helper: Given an array and an index, return the opposite value of the bit at that location"
   [inst index]
   (let [currentVal (nth inst index)]
     (if (= currentVal 0) 1 0)))
 
-
-
 ;; instance -> (mutated) instance
 (defn flip-one-bit
-  "Given an instance, we intend to flip a random bit off and a random bit on."
+  "Given an instance, we intend to flip a random bit."
   [answer]
   (let [size (count (:choices answer)),
         flip (rand-int size),
@@ -106,6 +110,10 @@
     (assoc answer :choices (assoc choices flip (findFlipVal choices flip)))
   )
 )
+
+
+
+
 
 
 ;; (find-score (flip-one-bit (random-search knapPI_16_20_1000_1 1))
