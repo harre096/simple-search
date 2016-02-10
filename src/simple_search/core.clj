@@ -55,7 +55,7 @@
          (map add-score
               (repeatedly max-tries #(random-answer instance)))))
 
-(time (random-search knapPI_16_20_1000_1 1000000
+(time (random-search knapPI_16_20_1000_1 10000
 ))
 
 
@@ -64,6 +64,14 @@
 ;;;;Dalton & Tom's Code
 ;;;;;;;;;;;;;;;;;;;;;;;
 
+(defn find-score
+  "Given an instance, find-score will look at the choices and update the totals."
+  [answer]
+  (let [included (included-items (:items (:instance answer)) (:choices answer))]
+      (add-score (assoc answer
+        :total-weight (reduce + (map :weight included))
+        :total-value (reduce + (map :value included))
+        ))))
 
 (defn run-mutator
   "Take a instance, mutator, and number of iterations. Then do hill climbing from that instance."
@@ -73,14 +81,10 @@
       inst
       (recur
        (+ start 1)
-       (let [new-inst (mutator inst)]
-         (if ( >= (score new-inst) (score inst))
+       (let [new-inst (find-score (mutator inst))]
+         (if ( > (:score new-inst) (:score inst))
            new-inst
-           inst)))))
-)
-
-
-
+           inst))))))
 
 ;;;Dalton & Tom's Tweak 1: Swap random item
 (defn findFlipVal
@@ -98,19 +102,17 @@
         flip2 (rand-int size),
         flip3 (rand-int size),
         choices (vec (:choices instance))]
-    ;(println flip1 flip2 flip3)
     (assoc instance :choices (assoc choices flip1 (findFlipVal choices flip1)))
-   ; (assoc instance :choices (assoc choices flip2 (findFlipVal choices flip2)))
-   ; (assoc instance :choices (assoc choices flip3 (findFlipVal choices flip3)))
   )
 )
 
+(find-score (swap-random-item (random-search knapPI_16_20_1000_1 1))
+)
 
-(swap-random-item (random-search knapPI_16_20_1000_1 1))
 
 (let [random-start (random-search knapPI_16_20_1000_1 1)]
   [random-start,
    "                                                 After we climed the hill, we got:"
    (run-mutator random-start swap-random-item 1000)]
-  )
+)
 
