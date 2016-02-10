@@ -18,6 +18,8 @@ This function will refresh the score after our mutator acts. This way, when our 
 #####Finally we climb some hills!
 To get started we run **random-search** a few thousand times to get us to a decent starting spot. Then we hill climb from there.
 
+
+
 ###Results
 When we run random 10,000 times followed by running our climbing operation 1000 times. Most of the time, we get an answers that are significatnly better! By changing just one item at a time we are actually seeing consistent climbing!
 
