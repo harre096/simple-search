@@ -31,7 +31,6 @@
      :total-weight (reduce + (map :weight included))
      :total-value (reduce + (map :value included))}))
 
-
 ;;; It might be cool to write a function that
 ;;; generates weighted proportions of 0's and 1's.
 
@@ -56,14 +55,12 @@
          (map add-score
               (repeatedly max-tries #(random-answer instance)))))
 
-(time (random-search knapPI_16_20_1000_1 10000
-))
+;(time (random-search knapPI_16_20_1000_1 10000
+;))
 
-
-
-;;;;;;;;;;;;;;;;;;;;;;;
-;;;;Dalton & Tom's Code
-;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;Dalton & Tom's Code;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn find-score
   "Given an instance, find-score will look at the choices and update the totals."
@@ -75,24 +72,44 @@
         ))))
 
 (defn run-mutator
-  "Take a instance, mutator, and number of iterations. Then do hill climbing from that instance."
-  [instance mutator max-tries]
-  (loop [start 0 inst instance]
+  "Take a instance, mutator, and number of iterations. Then do hill climbing from that answer, returning the best answer."
+  [answer mutator max-tries]
+  (loop [start 0 ans answer]
     (if (= start max-tries)
-      inst
+      ans
       (recur
-       (+ start 1)
-       (let [new-inst (find-score (mutator inst))]
-         (if ( > (:score new-inst) (:score inst))
-           new-inst
-           inst))))))
+       (inc start)
+       (let [new-ans (find-score (mutator ans))]
+         (if ( > (:score new-ans) (:score ans))
+           new-ans
+           ans))))))
+
+(defn random-restart
+  ""
+  [mutator knapsack restart-tries seed-tries]
+  (let [empty-answer {:score 0}]
+    (loop [tries restart-tries current-best empty-answer]
+      (if (= 0 tries)
+        current-best
+        (let [new-seed (random-search knapsack seed-tries)
+              mutation-tries (+ 100000 (rand-int 100000)) ;;gives range 100,000 to 200,000
+              mutated-seed (run-mutator new-seed mutator mutation-tries)]
+          (println "Random restart tris left " tries)
+          (if (> (:score mutated-seed) (:score current-best))
+            (let [seed-with-history (assoc mutated-seed :score-progression (conj (:score-progression mutated-seed) (:score mutated-seed)))]
+              (println "Weee! We found a better thing: " (:score-progression seed-with-history))
+              (recur (dec tries) seed-with-history))
+            ;;(recur (dec tries) current-best)
+            (let [seed-with-history (assoc current-best :score-progression (conj (:score-progression current-best) (:score current-best)))]
+              (println "Fail: " (:score-progression seed-with-history))
+              (recur (dec tries) seed-with-history))
 
 
+            ))))))
 
-
-
-;;;Dalton & Tom's Tweak: Flip one bit
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;Dalton & Tom's Tweak: Flip one bit;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn findFlipVal
   "Helper: Given an array and an index, return the opposite value of the bit at that location"
@@ -107,22 +124,16 @@
   (let [size (count (:choices answer)),
         flip (rand-int size),
         choices (vec (:choices answer))]
-    (assoc answer :choices (assoc choices flip (findFlipVal choices flip)))
-  )
-)
-
-
-
-
-
+    (assoc answer :choices (assoc choices flip (findFlipVal choices flip)))))
 
 ;; (find-score (flip-one-bit (random-search knapPI_16_20_1000_1 1))
 ;; )
 
+;; (let [random-start (random-search knapPI_16_20_1000_1 10000)]
+;;   [random-start,
+;;    "                                                 After we climed the hill, we got:"
+;;    (run-mutator random-start flip-one-bit 1000)]
+;; )
 
-(let [random-start (random-search knapPI_16_20_1000_1 10000)]
-  [random-start,
-   "                                                 After we climed the hill, we got:"
-   (run-mutator random-start flip-one-bit 1000)]
+(random-restart flip-one-bit knapPI_16_20_1000_1 8 10000
 )
-
