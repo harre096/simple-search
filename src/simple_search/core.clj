@@ -84,28 +84,90 @@
            new-ans
            ans))))))
 
+;; (defn random-restart
+;;   ""
+;;   [mutator knapsack restart-tries seed-tries]
+;;   (let [empty-answer {:score 0}]
+;;     (loop [tries restart-tries
+;;            current-best empty-answer]
+;;       (if (= 0 tries)
+;;         current-best
+;;         (let [new-seed (random-search knapsack seed-tries)
+;;               mutation-tries (+ 100000 (rand-int 100000)) ;;gives range 100,000 to 200,000
+;;               mutated-seed (run-mutator new-seed mutator mutation-tries)]
+;;           (println "Random restart tris left " tries)
+;;           (if (> (:score mutated-seed) (:score current-best))
+;;             (let [seed-with-history (assoc mutated-seed :score-progression (conj (:score-progression mutated-seed) (:score mutated-seed)))]
+;;               (println "Weee! We found a better thing: " (:score-progression seed-with-history))
+;;               (recur (dec tries) seed-with-history))
+;;             ;;(recur (dec tries) current-best)
+;;             (let [seed-with-history (assoc current-best :score-progression (conj (:score-progression current-best) (:score current-best)))]
+;;               (println "Fail: " (:score-progression seed-with-history))
+;;               (recur (dec tries) seed-with-history) )
+
+
+;;             ))))))
+
 (defn random-restart
   ""
   [mutator knapsack restart-tries seed-tries]
-  (let [empty-answer {:score 0}]
-    (loop [tries restart-tries current-best empty-answer]
+  (let [empty-answer {:score 0}
+        ;add-history #(assoc % :score-history (conj (:score-history %) (:score %)))]
+        ;add-history #(update-in % [:score-history] * 10)]
+    (loop [tries restart-tries
+           current-best empty-answer]
       (if (= 0 tries)
         current-best
         (let [new-seed (random-search knapsack seed-tries)
               mutation-tries (+ 100000 (rand-int 100000)) ;;gives range 100,000 to 200,000
               mutated-seed (run-mutator new-seed mutator mutation-tries)]
-          (println "Random restart tris left " tries)
-          (if (> (:score mutated-seed) (:score current-best))
-            (let [seed-with-history (assoc mutated-seed :score-progression (conj (:score-progression mutated-seed) (:score mutated-seed)))]
-              (println "Weee! We found a better thing: " (:score-progression seed-with-history))
-              (recur (dec tries) seed-with-history))
-            ;;(recur (dec tries) current-best)
-            (let [seed-with-history (assoc current-best :score-progression (conj (:score-progression current-best) (:score current-best)))]
-              (println "Fail: " (:score-progression seed-with-history))
-              (recur (dec tries) seed-with-history))
+          (recur
+           (dec tries)
+           ;;(add-history
+            (if (> (:score mutated-seed) (:score current-best)) mutated-seed current-best)
+            ))))));;;)
 
 
-            ))))))
+
+;; (defn random-restart
+;;   ""
+;;   [mutator knapsack restart-tries seed-tries]
+;;   (let [empty-answer {:score 0}]
+;;     (loop [tries restart-tries
+;;            current-best empty-answer]
+;;       (println "s")
+;;       (if (= 0 tries)
+;;         current-best
+;;         (let [new-seed (random-search knapsack seed-tries)
+;;               mutation-tries (+ 100000 (rand-int 100000)) ;;gives range 100,000 to 200,000
+;;               mutated-seed (run-mutator new-seed mutator mutation-tries)]
+;;           (println "Random restart tris left " tries)
+;;           (recur (dec tries) (if (> (:score mutated-seed) (:score current-best)) mutated-seed current-best))
+
+;;           ))))
+
+;;  (defn random-restart
+;;   ""
+;;   [mutator knapsack restart-tries seed-tries]
+;;   (let [empty-answer {:score 0}
+;;         my-f #(assoc %1 :score-progression (conj (:score-progression %1) (:score %1)))]
+;;     (loop [tries restart-tries
+;;            current-best empty-answer]
+;;       (if (= 0 tries)
+;;         current-best
+;;         (let [ mutated-seed (run-mutator
+;;                              (random-search knapsack seed-tries)
+;;                              mutator
+;;                              (+ 100000 (rand-int 100000)))]
+;;           (println "Random restart tris left " tries)
+;;           (recur (dec tries) (my-f (max (:score mutated-seed) (:score current-best)) mutated-seed current-best)))
+;;           ;;(recur (dec tries) (my-f (run-mutator (random-search knapsack seed-tries) mutator (+ 100000 (rand-int 100000)))))
+
+;;           ))))
+
+
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;Dalton & Tom's Tweak: Flip one bit;;;
