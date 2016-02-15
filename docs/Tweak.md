@@ -44,4 +44,10 @@ When we run random 10,000 times followed by running our climbing operation 1000 
 
 
 ### Random Restarts
-We didn't get this far. :(
+Calling random restart will: 
+1. Make a random seed and use the mutator on it a random number of times (100,000 to 200,000 mutations)
+2. Repeat step 1 as many times as you would like to reset
+
+We called our funtion, telling it to reset 8 times and were generally sucessful seeing improvements over several of the resets.
+
+We attemped to add a :score-history into our winning answer after each reset, but that seemed to only work if the freshly mutated score lost. (We would like to ask you about this...)
