@@ -52,4 +52,4 @@ Calling random restart will:
 
 We called our funtion, telling it to reset 8 times and were generally sucessful seeing improvements over several of the resets.
 
-We attemped to add a :score-history into our winning answer after each reset, but that seemed to only work if the freshly mutated score lost. (We would like to ask you about this...)
+We know when our result is imporvoving due to random reset based on the println command. We attemped to streamline this by adding a :score-history into our winning answer after each reset, but that seemed to only work if the freshly mutated score lost. (We would like to ask you about this...)
