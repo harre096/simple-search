@@ -105,6 +105,7 @@
     (loop [tries restart-tries
            current-best empty-answer
            new-mutant (mutate-from-new-seed)]
+      (println "With " tries " tries left, score is " (:score current-best))
       (if (= 0 tries)
         current-best
           (recur
@@ -115,8 +116,7 @@
               ;(add-history current-best))
               new-mutant current-best)
 
-            (mutate-from-new-seed)
-            )))))
+            (mutate-from-new-seed))))))
 
 
 
