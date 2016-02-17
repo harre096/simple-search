@@ -43,6 +43,15 @@
     0
     (:total-value answer)))
 
+(defn penalized-score
+  "Takes the total-weight of the given answer unless it's over capacity,
+   in which case we return the negative of the total weight."
+  [answer]
+  (if (> (:total-weight answer)
+         (:capacity (:instance answer)))
+    (- (:total-weight answer))
+    (:total-value answer)))
+
 (defn add-score
   "Computes the score of an answer and inserts a new :score field
    to the given answer, returning the augmented answer."
@@ -55,8 +64,8 @@
          (map add-score
               (repeatedly max-tries #(random-answer instance)))))
 
-;(time (random-search knapPI_16_20_1000_1 10000
-;))
+;; (time (random-search knapPI_16_20_1000_1 10000
+;; ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;Dalton & Tom's Code;;;;
@@ -68,8 +77,7 @@
   (let [included (included-items (:items (:instance answer)) (:choices answer))]
       (add-score (assoc answer
         :total-weight (reduce + (map :weight included))
-        :total-value (reduce + (map :value included))
-        ))))
+        :total-value (reduce + (map :value included))))))
 
 (defn run-mutator
   "Take a instance, mutator, and number of iterations. Then do hill climbing from that answer, returning the best answer."
@@ -84,15 +92,18 @@
            new-ans
            ans))))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;Dalton & Tom's Random Restart;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn gen-random-seed
-  "Givend and instance and a number, return the best randomly generated seed."
+  "Given an instance and a number, return the best randomly generated seed."
   [knapsack seed-tries]
   (random-search knapsack seed-tries))
 
-
-(defn random-restart
-  "Each random-try agnerates a random seed and improves it using the mutator. After impoving a random number of times, randomly restart."
+(defn random-restart-random-runs
+  "Each random-try agnerates a random seed and improves it using the mutator. After impoving a random
+  number of times, randomly restart."
   [mutator knapsack restart-tries seed-tries]
   (let [empty-answer {:score 0}
         mutate-from-new-seed (fn [] (run-mutator
@@ -105,7 +116,7 @@
     (loop [tries restart-tries
            current-best empty-answer
            new-mutant (mutate-from-new-seed)]
-      (println "With " tries " tries left, score is " (:score current-best))
+;;       (println "With " tries " tries left, score is " (:score current-best))
       (if (= 0 tries)
         current-best
           (recur
@@ -115,11 +126,41 @@
               ;(add-history new-mutant)
               ;(add-history current-best))
               new-mutant current-best)
-
             (mutate-from-new-seed))))))
 
+(defn random-restart
+  "We chose to randomly restart 10 times, regardless of max-tries value.
+  Example: max-tries:1000:
+    Each reset ends up with 100 'rations' to use in building an answer.
+    --> 1/2 of these rations are used in building a decent randomly generated seed.
+    --> 1/2 of the rations are used to hill climb."
+  [mutator knapsack max-tries]
+  (let [empty-answer {:score 0}
+        rations (/ (/ max-tries 10) 2) ;; reset 10 times, Each time, use half of the rations to generate seed and other half to hillclimb
+        mutate-from-new-seed (fn [] (run-mutator
+                                      (gen-random-seed knapsack rations)
+                                      mutator
+                                      rations
+                                      ))
+        ]
+    (loop [tries 10 ;reset 10 times
+           current-best empty-answer
+           new-mutant (mutate-from-new-seed)]
+;;       (println "With " tries " tries left, score is " (:score current-best))
+      (if (= 0 tries)
+        current-best
+          (recur
+            (dec tries)
 
+            (if (> (:score new-mutant) (:score current-best))
+              new-mutant current-best)
+            (mutate-from-new-seed))))))
 
+(defn hill-climber
+  "hill-climber without random-restart"
+  [mutator knapsack max-tries]
+  (let [random-start (random-search knapsack (/ max-tries 2))]
+     (run-mutator random-start mutator (/ max-tries 2))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;Dalton & Tom's Tweak: Flip one bit;;;
@@ -131,7 +172,6 @@
   (let [currentVal (nth inst index)]
     (if (= currentVal 0) 1 0)))
 
-;; instance -> (mutated) instance
 (defn flip-one-bit
   "Given an instance, we intend to flip a random bit."
   [answer]
@@ -143,11 +183,5 @@
 ;; (find-score (flip-one-bit (random-search knapPI_16_20_1000_1 1))
 ;; )
 
-;; (let [random-start (random-search knapPI_16_20_1000_1 10000)]
-;;   [random-start,
-;;    "                                                 After we climed the hill, we got:"
-;;    (run-mutator random-start flip-one-bit 1000)]
+;; (random-restart flip-one-bit knapPI_16_20_1000_1 8 10000
 ;; )
-
-(random-restart flip-one-bit knapPI_16_20_1000_1 8 10000
-)
