@@ -13,7 +13,7 @@
   (for [searcher searchers
         p problems
         n (range num-replications)]
-    (let [answer (future (searcher p max-evals))]
+    (let [answer (searcher p max-evals)]
       {:searcher searcher
        :problem p
        :max-evals max-evals
@@ -27,7 +27,7 @@
              (:label (:problem result))
              (:max-evals result)
              (:run-number result)
-             (:score @(:answer result)))))
+             (:score (:answer result)))))
 
 ;; This really shouldn't be necessary, as I should have included the labels
 ;; in the maps when generated the problem files. Unfortunately I only just
