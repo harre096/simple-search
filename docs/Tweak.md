@@ -58,7 +58,7 @@ We know when our result is imporvoving due to random reset based on the println 
 
 We chose to randomly restart 10 times, regardless of max-tries value.
 
-Example: max-tries:1000:
+Example: max-tries = 1000:
     Each reset ends up with 100 'rations' to use in building an answer.
     
     --> 1/2 of these rations are used in building a decent randomly generated seed.
