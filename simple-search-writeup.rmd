@@ -1,0 +1,106 @@
+---
+title: "Simple Search Writeup"
+author: "Dalton Gusaas && Thomas Harren"
+output: 
+  html_document:
+    toc: true
+---
+
+# Introduction
+
+In these set of experiements we explore the differences between three different techniques. Full explantions can be found on our readme at https://github.com/harre096/simple-search/blob/master/docs/Tweak.md. 
+
+As a summary, our techiques are: 
+
+* half_random_half_hill_climber
+    * Runs random search for half of the tries and then uses hill_climber using the flip-one-bit mutator. 
+* rand_reset_10_times
+    * Runs the above 10 times, generating a new seed each time.
+* random_search
+    * Nic's random search method.
+
+The mutator that we use is flip-one-bit, which modifies an answer by randomly flipping one bit.
+
+We apply these techniques to seven data sets: 
+
+* "knapPI_11_20_1000_4" 
+* "knapPI_13_20_1000_4" 
+* "knapPI_16_20_1000_4"
+* "knapPI_11_200_1000_4" 
+* "knapPI_13_200_1000_4"
+* "knapPI_16_200_1000_4"
+
+
+There are two possible variables to the trials:
+* Varying the number of repetitions
+    * We set this as 30 each time. We thought that this seemed like a fairly large number of repetitions.
+* Varying the number of tries that each run gets to find the answer. (These tries were split between random and our hillclimb in the various ways described above.) W tested with 3 different tries amounts:
+    * 10,000
+    * 100,000
+    * 300,000
+    
+#Let's look at some data!
+
+## 10,000 tries
+```{r warning=FALSE}
+library("ggplot2")
+
+data_50_runs <- read.csv("10000Tries.txt", sep="")
+
+ggplot(data_50_runs, 
+       aes(x=factor(Max_evals), y=Score, group=Max_evals)) + 
+  geom_boxplot() + facet_grid(Search_method ~ Problem)
+```
+
+```{r}
+library("rpart")
+library("rpart.plot")
+
+rp <- rpart(Score ~ Search_method + Problem + Max_evals, data=data_50_runs)
+
+rpart.plot(rp, type=3, extra=100)
+```
+
+## 100,000 tries
+```{r warning=FALSE}
+library("ggplot2")
+
+data_50_runs <- read.csv("100000Tries.txt", sep="")
+
+ggplot(data_50_runs, 
+       aes(x=factor(Max_evals), y=Score, group=Max_evals)) + 
+  geom_boxplot() + facet_grid(Search_method ~ Problem)
+```
+
+```{r}
+library("rpart")
+library("rpart.plot")
+
+rp <- rpart(Score ~ Search_method + Problem + Max_evals, data=data_50_runs)
+
+rpart.plot(rp, type=3, extra=100)
+```
+
+## 300,000 tries
+```{r warning=FALSE}
+library("ggplot2")
+
+data_50_runs <- read.csv("300000Tries.txt", sep="")
+
+ggplot(data_50_runs, 
+       aes(x=factor(Max_evals), y=Score, group=Max_evals)) + 
+  geom_boxplot() + facet_grid(Search_method ~ Problem)
+```
+
+```{r}
+library("rpart")
+library("rpart.plot")
+
+rp <- rpart(Score ~ Search_method + Problem + Max_evals, data=data_50_runs)
+
+rpart.plot(rp, type=3, extra=100)
+```
+
+# Conclusion
+
+From these results its clear that ...
