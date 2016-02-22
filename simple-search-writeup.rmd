@@ -103,4 +103,15 @@ rpart.plot(rp, type=3, extra=100)
 
 # Conclusion
 
-From these results its clear that ...
+## Summary of Implications
+
+When given a decent seed, our hill climber can improve the answer. Using random reset to build multiple new seeds (using random) generally returned an even better answer. However, there were several flaws in our implantation that led our results to be less exciting than our results of our work from the previous lab.
+
+One flaw in our plan was that, when developing our hill climber and random restart functions, we did not consider running random-search as a cost. We knew we could get a good seed if we ran random-search enough times. Then, with a good seed, we could see if we had a working hill climber and reset function. So in practice, we implemented our hill climber and random reset functions as tools to improve upon a good seed, rather than a complete alternative to random. The good news is that we did see improvement on the knapsack problems when we tuned our algorithms by hand. The bad news was that what we implemented did not compare fairly with random-search since it was dependent on random-search. As a result, we ended up regulating the number of tries by restricting random. However, to get decent seed, we still chose to use half of our tries for running random for both hill climbing algorithms. This was less than desirable.
+
+Another big flaw was leaving our algorithms in cliff mode. For random, cliffs didn't matter as a completely new seed was generated each time. The new seed was either better than the old seed or it wasn't, so no gradient was needed. This was not the case for hill climbing. Anytime we hit hill climbing mode without a positive seed, it was highly unlikely for our hill climber to climb anywhere, since the only mutator we fully implemented flipped only a single random bit at a time before checking for progress. This worked alright for making incremental progress, but not particularly well for getting from an invalid answer to an answer.
+
+We saw that all three algorithms performed nearly equally on most of the data sets. If the number of tries was low, random was often unable to come up with a positive answer. As a result, hill climbing didn't work in this case either, since it didn't have a decent seed to build from. If tries were high, then both random and hill climbing were able to come up will reasonably good answers consistently, possibly from sheer number of tries alone. One of our data sets did hit a sort of sweet spot where our climbing did actually be random. This could indicate that, under the right conditions, our hill climber can actually be more effective than random. :)
+
+## Concise Summary
+Don't depend on random to do all of the work of generating a starter seed, especially if you are trying to beat random. Scoring with a cliff can makes incremental progress virtually impossible if you start at the bottom of a cliff.
